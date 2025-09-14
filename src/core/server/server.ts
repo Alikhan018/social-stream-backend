@@ -1,10 +1,12 @@
 import express, { Express, Request, Response, NextFunction } from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
-const cookieParser = require("cookie-parser");
+import cookieParser from "cookie-parser";
 import RoutesHelper from "../routes/base.routes";
 import path from "path";
-
+import DatabaseConnection from "../database/connection.database";
+import AuthRoutes from "../../modules/auth/routes/auth.routes";
+import UserRoutes from "../../modules/user/routes/user.routes";
 
 
 
@@ -17,8 +19,18 @@ class App {
     this.helper = RoutesHelper;
     this.accessControl();
     this.initializeMiddleware();
+    this.dbStart();
     this.initializeRoutes();
     this.startServer();
+  }
+
+  private async dbStart() {
+    try {
+      await DatabaseConnection.connect();
+    } catch (error) {
+      console.error("Failed to connect to the database:", error);
+      process.exit(1);
+    }
   }
 
   private accessControl() {
@@ -30,13 +42,13 @@ class App {
       res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept, X-Requested-With, application/json");
       next();
     });
-    
+
   }
 
   private initializeMiddleware() {
     this.app.use(bodyParser.json({ limit: '50mb' }));;
     this.app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
-    this.app.use('/uploads', express.static(path.join(__dirname, '..','..',  'assets', 'uploads')));
+    this.app.use('/uploads', express.static(path.join(__dirname, '..', '..', 'assets', 'uploads')));
   }
 
   private initializeRoutes(): void {
@@ -45,17 +57,22 @@ class App {
 
 
       //Admin
-     
+
 
     ];
-    
-    const openRoutes: any[] = []; //non authenticated routes
 
-  
+    const openRoutes: any[] = [
+      AuthRoutes,
+      UserRoutes
+    ]; //non authenticated routes
+
+
     this.app.get("/", (req: Request, res: Response) => {
-      res.json({ message: `App is running ` ,
-        format:`${Intl.DateTimeFormat().resolvedOptions().timeZone}`,
-        time:`${new Date()}`,});
+      res.json({
+        message: `App is running `,
+        format: `${Intl.DateTimeFormat().resolvedOptions().timeZone}`,
+        time: `${new Date()}`,
+      });
     });
 
     this.helper.initializeRoutes(this.app, true, routes);
@@ -68,7 +85,7 @@ class App {
   private async startServer(): Promise<void> {
     const port = process.env.PORT || 3001;
     this.app.listen(port, () => {
-      console.log(`path:${path.join(__dirname, '..','..',  'assets', 'uploads')}`);
+      console.log(`path:${path.join(__dirname, '..', '..', 'assets', 'uploads')}`);
       console.log(`Server is running on port ${port}`);
     });
   }

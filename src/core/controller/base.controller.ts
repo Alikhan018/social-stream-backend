@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
 
-abstract class BaseController<T> {
-  protected abstract service: T;
+abstract class BaseController {
+  // protected abstract service: T;
 
-  protected async handleRequest(
+  protected static async handleRequest(
     operation: () => Promise<any>,
     successMessage: string,
     errorMessage: string,
@@ -17,9 +17,9 @@ abstract class BaseController<T> {
       console.error(errorMessage, error);
       res.status(500).json({ error: errorMessage });
     }
-  } 
+  }
 
-  
+
 }
 
 export default BaseController;
