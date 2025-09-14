@@ -9,6 +9,7 @@
     "test:coverage": "jest --coverage",
     "test:verbose": "jest --verbose",
     "dev": "concurrently \"tsc -w\" \"nodemon index.js\"",
+    "build": "npm install && tsc",
     "start-server": "node server.js",
     "tsc": "tsc -w"
   },
