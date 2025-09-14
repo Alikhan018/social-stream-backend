@@ -7,6 +7,8 @@ import path from "path";
 import DatabaseConnection from "../database/connection.database";
 import AuthRoutes from "../../modules/auth/routes/auth.routes";
 import UserRoutes from "../../modules/user/routes/user.routes";
+import PostRoutes from "../../modules/post/routes/post.routes";
+import CommentRoutes from "../../modules/comment/routes/comment.routes";
 
 
 
@@ -47,6 +49,7 @@ class App {
 
   private initializeMiddleware() {
     this.app.use(bodyParser.json({ limit: '50mb' }));;
+    this.app.use(express.json());
     this.app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
     this.app.use('/uploads', express.static(path.join(__dirname, '..', '..', 'assets', 'uploads')));
   }
@@ -63,7 +66,9 @@ class App {
 
     const openRoutes: any[] = [
       AuthRoutes,
-      UserRoutes
+      UserRoutes,
+      PostRoutes,
+      CommentRoutes
     ]; //non authenticated routes
 
 
